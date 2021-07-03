@@ -1,0 +1,1 @@
+docker build . -t chrisroselle/cli-tools:latest -t chrisroselle/cli-tools:redhat
