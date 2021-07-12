@@ -1,0 +1,32 @@
+type: function
+name: example_function2
+description: "This is an example function"
+options:
+- short: "t"
+  long: "thing"
+  description: "This is a description for the 'thing' option"
+  default: "value"
+  flag: False
+  required: True
+- short: "w"
+  long: "widget"
+  description: "This is a description for the 'widget' option"
+  flag: False
+  required: True
+- short: "f"
+  long: "example-flag"
+  description: "This is a description for the 'example-flag' flag"
+  default: False
+  flag: True
+  required: False
+- short: "z"
+  long: "other-flag"
+  description: "This is a description for the 'other-flag' flag, which is true by default"
+  default: True
+  flag: True
+  required: False
+positional:
+    long: "input"
+    description: "This is the description for a positional input"
+    multiple_allowed: True
+    required: True
