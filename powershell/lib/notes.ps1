@@ -24,11 +24,12 @@ function notes($search) {
     foreach ($arg in $args) {
         $command = "$command | select-string -pattern '$arg'"
     }
+    $command = "$command | %{@(`$_.Filename, `$_.Line) -join ':'}"
     invoke-expression $command
 }
 
 function notes-or() {
-    get-childitem -path $notes -recurse | select-string -pattern $args
+    get-childitem -path $notes -recurse | select-string -pattern $args | %{@($_.Filename, $_.Line) -join ':'}
 }
 
 function new-note($name) {

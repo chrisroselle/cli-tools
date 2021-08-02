@@ -2,3 +2,5 @@
 java/*.class
 powershell/env.ps1
 shell/env.sh
+
+**/venv/

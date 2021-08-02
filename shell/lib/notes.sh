@@ -26,7 +26,7 @@ notes() {
     [[ -z $1 ]] && { echo "usage: $FUNCNAME <content_search> ..." >&2; return 1; }
     local command="grep -iR '$1' $notes"
     for search in "$@"; do
-        comment+=" | grep -i '$search'"
+        command+=" | grep -i '$search'"
     done
     eval $command
 }

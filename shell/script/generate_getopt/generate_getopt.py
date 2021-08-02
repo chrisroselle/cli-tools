@@ -110,7 +110,7 @@ parser.add_argument('configuration', help='The configuration file that specifies
 args = parser.parse_args()
 
 # getopt parameters
-short_options = ""
+short_options = []
 long_options = []
 
 # what will go in usage output
@@ -184,7 +184,7 @@ for o in cfg['options']:
     variables.append(opt.variable)
 
     if opt.short:
-        short_options += opt.getopt_short
+        short_options.append(opt.getopt_short)
 
     case_statements.append(opt.case)
     long_options.append(opt.getopt_long)
@@ -213,9 +213,8 @@ mx += 3
 newline = '\n'
 print(f'''{usage_name}() {{
     echo "usage: {name} [OPTIONS]{positional_usage_string}
-{newline.join([f'{u[0].ljust(mx)}{u[1]}' for u in positional_usage])}
-{newline.join([f'{u[0].ljust(mx)}{u[1]}' for u in required_option_usage])}
-{newline.join([f'{u[0].ljust(mx)}{u[1]}' for u in optional_option_usage])}
+
+{newline.join([f'{u[0].ljust(mx)}{u[1]}' for u in sorted(positional_usage) + sorted(required_option_usage) + sorted(optional_option_usage)])}
 
 {description}
 
@@ -232,7 +231,7 @@ print('}\n')
 print(f'''{main_name}()  {{
     # Input Parsing
     local opts
-    opts=$(getopt --options "{short_options}" --longoptions "{",".join(long_options)}" -- "$@")
+    opts=$(getopt --options "{"".join(sorted(short_options))}" --longoptions "{",".join(sorted(long_options) + ["help"])}" -- "$@")
     [[ $? != "0" ]] && {usage_statement()}
     eval set -- "$opts"''')
 if len(variables_with_no_default) > 0:
@@ -242,10 +241,11 @@ if len(variables_with_defaults) > 0:
         print(f'    local {v}="{variables_with_defaults[v]}"')
 print('''    while :; do
         case "$1" in''')
-for c in case_statements:
+for c in sorted(case_statements):
     print(f'            {c}')
-print(f'''            --) shift; break ;;
-            *) {usage_statement()} ;;
+print(f'''            --help) {usage_statement()[2:-3]} ;;
+            --) shift; break ;;
+            *) {usage_statement()[2:-3]} ;;
         esac
     done''')
 if positional and not positional.multiple:
@@ -253,7 +253,7 @@ if positional and not positional.multiple:
 
 print('''
     # Input Validation''')
-for v in validation_statements:
+for v in sorted(validation_statements):
     print(f'    {v}')
 print('\n    # Function')
 if positional and positional.multiple:
