@@ -1,3 +1,7 @@
+set-alias -name np -value "C:\Program Files (x86)\Notepad++\notepad++.exe"
+set-alias -name grep -value rg
+set-alias -name which -value where.exe
+
 function Check-Exe() {
     if ($LASTEXITCODE -gt 0) {
         throw "last command failed"
@@ -12,14 +16,6 @@ function lsf($search) {
     get-command -type function | findstr $search
 }
 
-function np() {
-    &"C:\Program Files (x86)\Notepad++\notepad++.exe" $args.split(" ")
-}
-
 function utc() {
     [datetime]::Now.ToUniversalTime()
-}
-
-function Which($command) {
-    where.exe $command
 }

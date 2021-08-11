@@ -25,23 +25,30 @@ RUN yum -y install \
 #    && update-ca-trust \
 #    && echo "NODE_EXTRA_CA_CERTS='/etc/pki/ca-trust/"
 
+# install ripgrep
+RUN cd /tmp \
+    && curl -LJs $(curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep browser_download_url | grep linux-musl | cut -d '"' -f 4) -o ripgrep.tar.gz \
+    && tar xzf ripgrep.tar.gz \
+    && mv ripgrep-*/rg /usr/local/bin/rg \
+    && chmod +x /usr/local/bin/rg
+
 # install yq
 RUN curl -LJs $(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4) -o /usr/local/bin/yq \
     && chmod +x /usr/local/bin/yq
 
-## install kubectl
-#RUN curl -LS  "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
-#    && chmod +x /usr/local/bin/kubectl
-#
-## install helm
-#ARG HELM_VERSION="3.5.4"
-#RUN cd /tmp \
-#    && curl -LJs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" -o "helm.tar.gz" \
-#    && tar xzf helm.tar.gz \
-#    && mv linux-amd64/helm /usr/local/bin/helm \
-#    && chmod +x /usr/local/bin/helm \
-#    && rm -r ./*
-#
+# install kubectl
+RUN curl -LS  "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
+    && chmod +x /usr/local/bin/kubectl
+
+# install helm
+ARG HELM_VERSION="3.5.4"
+RUN cd /tmp \
+    && curl -LJs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" -o "helm.tar.gz" \
+    && tar xzf helm.tar.gz \
+    && mv linux-amd64/helm /usr/local/bin/helm \
+    && chmod +x /usr/local/bin/helm \
+    && rm -r ./*
+
 ## install nodejs + yarn
 #ARG NODEJS_VERSION="14.17.0"
 #RUN cd /tmp \
@@ -60,13 +67,13 @@ RUN curl -LJs $(curl -s https://api.github.com/repos/mikefarah/yq/releases/lates
 #    && ln -s /usr/local/apache-maven-${MAVEN_VERSION}/bin/mvnDebug /usr/local/bin/mvnDebug \
 #    && ln -s /usr/local/apache-maven-${MAVEN_VERSION}/bin/mvnyjp /usr/local/bin/mvnyjp
 #
-## install AWS CLI
-#RUN cd /tmp \
-#    && curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O \
-#    && unzip awscli-exe-linux-x86_64.zip \
-#    && ./aws/install \
-#    && rm -r ./*
-#
+# install AWS CLI
+RUN cd /tmp \
+    && curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O \
+    && unzip awscli-exe-linux-x86_64.zip \
+    && ./aws/install \
+    && rm -r ./*
+
 ## install AWS CLI Session Manager Plugin
 ## https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
 #RUN cd /tmp \

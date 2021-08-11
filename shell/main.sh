@@ -2,6 +2,7 @@
 
 # get folder that main.sh is in
 _DIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
+source _$DIR/env.sh
 
 for f in $_DIR/lib/*.sh; do
   source $f

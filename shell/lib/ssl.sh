@@ -126,3 +126,28 @@ get_certificate_sni() {
     local SERVER=$1
     openssl s_client -servername ${SERVER%:*} -connect $SERVER </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ${SERVER%:*}.crt
 }
+
+get_expiration_pem() {
+    if [[ -z $1 ]]; then
+        echo "get_expiration_pem: missing parameter(s)" >&2
+        echo "usage: get_expiration_pem <pem_encoded_certificate>" >&2
+        echo "example: get_expiration_pem certificate.crt" >&2
+        return 1
+    fi
+    local CRT=$1
+    local tmp
+    tmp=$(openssl x509 -enddate -noout -in $CRT) || return 1
+    tmp="${tmp#*=}"
+    date -d "$tmp" '+%Y-%m-%d'
+}
+
+get_san_pem() {
+    if [[ -z $1 ]]; then
+        echo "get_san_pem: missing parameter(s)" >&2
+        echo "usage: get_san_pem <pem_encoded_certificate>" >&2
+        echo "example: get_san_pem certificate.crt" >&2
+        return 1
+    fi
+    local CRT=$1
+    openssl x509 -ext subjectAltName -noout -in $CRT | tail -n -1 | sed 's/, DNS:/ /g' | sed 's/\s*DNS://'
+}
