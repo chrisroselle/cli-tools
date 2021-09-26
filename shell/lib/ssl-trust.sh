@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trust_pem_centos() {
+ssl_trust_pem_centos() {
     if [[ -z $1 ]]; then
         echo "trust_pem_centos: missing parameter" >&2
         echo "usage: trust_pem_centos <pem_encoded_certificate> [<pem_encoded_certificate> ...]" >&2
@@ -14,7 +14,7 @@ trust_pem_centos() {
     update-ca-trust
 }
 
-trust_pem_jdk() {
+ssl_trust_pem_jdk() {
     if [[ -z $2 ]]; then
         echo "trust_pem_jdk: missing parameter(s)" >&2
         echo "usage: trust_pem_jdk <java_home> <pem_encoded_certificate> [<pem_encoded_certificate> ...]" >&2
@@ -28,7 +28,7 @@ trust_pem_jdk() {
     done
 }
 
-keystore_contains_certificate() {
+ssl_keystore_contains_certificate() {
     if [[ -z $2 ]]; then
         echo "keystore_contains_certificate: missing parameter(s)" >&2
         echo "usage: keystore_contains_certificate <keystore> <certificate>" >&2

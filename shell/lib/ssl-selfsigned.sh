@@ -5,7 +5,7 @@
 # https://www.ssl.com/blogs/398-day-browser-limit-for-ssl-tls-certificates-begins-september-1-2020/
 # https://security.stackexchange.com/questions/70495/ssl-certificate-is-passphrase-necessary-and-how-does-apache-know-it
 
-make_root_certificate() {
+ssl_make_root_certificate() {
     if [[ -z $1 ]]; then
         echo "make_root_certificate: missing parameter(s)" >&2
         echo "usage: make_root_certificate <common_name> [<file_name>]" >&2
@@ -22,7 +22,7 @@ make_root_certificate() {
     openssl req -x509 -new -nodes -key $FILENAME.key -sha256 -days 3970 -out $FILENAME.crt -subj "/CN=$CN"
 }
 
-make_intermediate_certificate() {
+ssl_make_intermediate_certificate() {
     if [[ -z $3 ]]; then
         echo "make_intermediate_certificate: missing parameter(s)" >&2
         echo "usage: make_intermediate_certificate <signing_certificate> <signing_key> <common_name> [<file_name>]" >&2
@@ -56,7 +56,7 @@ EOF
     rm $FILENAME.csr $FILENAME.cfg
 }
 
-make_signed_certificate() {
+ssl_make_signed_certificate() {
     if [[ -z $3 ]]; then
         echo "make_signed_certificate: missing parameter(s)" >&2
         echo "usage: make_signed_certificate <signing_certificate> <signing_key> <common_name> [<alternative_name> ...]" >&2
@@ -95,7 +95,7 @@ EOF
     rm $FILENAME.csr $FILENAME.cfg
 }
 
-make_self_signed_certificate() {
+ssl_make_self_signed_certificate() {
     if [[ -z $1 ]]; then
         echo "make_self_signed_certificate: missing parameter(s)" >&2
         echo "usage: make_self_signed_certificate <common_name> [<alternative_name> ...]" >&2

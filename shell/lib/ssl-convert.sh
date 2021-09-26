@@ -1,6 +1,6 @@
 #!/bin/bash
 
-der2pem() {
+ssl_der2pem() {
     if [[ -z $1 ]]; then
         echo "der2pem: missing parameter(s)" >&2
         echo "usage: der2pem <der_encoded_certificate>" >&2
@@ -12,7 +12,7 @@ der2pem() {
     openssl x509 -inform der -in $DER -out $PEM
 }
 
-pem2der() {
+ssl_pem2der() {
     if [[ -z $1 ]]; then
         echo "pem2der: missing parameter(s)" >&2
         echo "usage: pem2der <der_encoded_certificate>" >&2
@@ -24,7 +24,7 @@ pem2der() {
     openssl x509 -outform der -in $PEM -out $DER
 }
 
-pem2jks() {
+ssl_pem2jks() {
     if [[ -z $2 ]]; then
         echo "pem2jks: missing parameter(s)" >&2
         echo "usage: pem2jks <pem_encoded_certificate> <pem_encoded_key> [<ca_chain> <output_file>]" >&2
@@ -38,12 +38,12 @@ pem2jks() {
     if [[ -z $4 ]]; then
         KEYSTORE=keystore.jks
     fi
-    pem2pkcs12 $CERT $KEY $CA_CHAIN tmp.p12
+    ssl_pem2pkcs12 $CERT $KEY $CA_CHAIN tmp.p12
     keytool -importkeystore -destkeystore $KEYSTORE -deststoretype jks -deststorepass changeit -srckeystore tmp.p12 -srcstoretype pkcs12 -srcstorepass changeit
     rm tmp.p12
 }
 
-pem2pkcs12() {
+ssl_pem2pkcs12() {
     if [[ -z $3 ]]; then
         echo "pem2pkcs12: missing parameter(s)" >&2
         echo "usage: pem2pkcs12 <pem_encoded_certificate> <pem_encoded_key> <output_file> [<ca_chain>]" >&2
@@ -60,7 +60,7 @@ pem2pkcs12() {
     openssl pkcs12 -export -in $CERT -inkey $KEY $CA -name private_key -out $OUTPUT -password pass:changeit
 }
 
-pkcs122pem() {
+ssl_pkcs122pem() {
     if [[ -z $1 ]]; then
         echo "pkcs122pem: missing parameter(s)" >&2
         echo "usage: pkcs122pem <pkcs12_encoded_certificate>" >&2

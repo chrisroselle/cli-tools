@@ -1,0 +1,19 @@
+type: function
+name: ssl_get_certificate
+description: "Get SSL Certificate from remote server"
+options:
+- short: "n"
+  long: "sni"
+  description: "Use SNI"
+  flag: True
+  required: False
+- short: "f"
+  long: "full-chain"
+  description: "Get full certificate chain"
+  flag: True
+  required: False
+positional:
+    long: "server"
+    description: "The server to connect to in the format <host>[:<port>]. If no port is provided, 443 will be used"
+    multiple_allowed: False
+    required: True
