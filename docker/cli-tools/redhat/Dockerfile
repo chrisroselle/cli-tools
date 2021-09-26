@@ -41,7 +41,7 @@ RUN curl -LS  "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/st
     && chmod +x /usr/local/bin/kubectl
 
 # install helm
-ARG HELM_VERSION="3.5.4"
+ARG HELM_VERSION="3.6.3"
 RUN cd /tmp \
     && curl -LJs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" -o "helm.tar.gz" \
     && tar xzf helm.tar.gz \
@@ -50,7 +50,7 @@ RUN cd /tmp \
     && rm -r ./*
 
 ## install nodejs + yarn
-#ARG NODEJS_VERSION="14.17.0"
+#ARG NODEJS_VERSION="14.17.4"
 #RUN cd /tmp \
 #    && curl -s "https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz" -o nodejs.tar.xz \
 #    && tar xJf "nodejs.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
@@ -82,7 +82,11 @@ RUN cd /tmp \
 #    && rm ./session-manager-plugin.rpm
 
 # update bash profile
-RUN echo "[[ -f /scripts/main.sh ]] && source /scripts/main.sh" >> /root/.bashrc \
+RUN echo "if [[ -n \"\$SOURCE_LIST\" ]]; then" >> /root/.bashrc \
+    && echo "    for f in \$SOURCE_LIST; do" >> /root/.bashrc \
+    && echo "        source \$f" >> /root/.bashrc \
+    && echo "    done" >> /root/.bashrc \
+    && echo "fi" >> /root/.bashrc \
     && echo "source /root/.bashrc" >> /root/.bash_profile
 
 CMD /bin/bash
