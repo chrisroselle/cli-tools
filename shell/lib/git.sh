@@ -18,18 +18,26 @@ _g_default_branch() {
 
 g_feature() {
     _g_sanity || return 1
-    local new_branch="$1"
+    local repo="$1"
+    local new_branch="$2"
     [[ -z $new_branch ]] && {
-        echo "usage: g_feature <new_branch_name>" >&2
+        echo "usage: g_feature <repo> <new_branch_name>" >&2
         return 1
     }
+    cd ~/.git/$repo || return 1
     local current_branch default_branch
     current_branch=$(git branch --show-current)
     default_branch=$(_g_default_branch)
     if [[ $current_branch != $default_branch ]]; then
         local status
         status=$(git status --short)
-        [[ -z $status ]] && git checkout "$default_branch"
+        if [[ -z $status ]]; then
+            git checkout "$default_branch"
+        else
+            git status --short
+            echo "error: working tree is unclean" >&2
+            return 1
+        fi
     fi
     git pull
     git checkout -b "$new_branch" || return 1
