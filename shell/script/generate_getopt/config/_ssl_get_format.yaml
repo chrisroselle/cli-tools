@@ -1,0 +1,9 @@
+type: function
+name: _ssl_get_format
+description: "Get SSL Certificate format"
+options: []
+positional:
+    long: "certificate"
+    description: "The certificate to check"
+    multiple_allowed: False
+    required: True

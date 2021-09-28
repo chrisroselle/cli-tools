@@ -1,5 +1,56 @@
 #!/bin/bash
 
+__ssl_get_format_usage() {
+    echo "usage: _ssl_get_format [OPTIONS] CERTIFICATE
+
+  CERTIFICATE   The certificate to check
+
+Get SSL Certificate format
+
+Examples:
+    _ssl_get_format certificate.crt" >&2
+}
+
+_ssl_get_format()  {
+    # Input Parsing
+    local opts
+    opts=$(getopt --options "" --longoptions "help" -- "$@")
+    [[ $? != "0" ]] && { __ssl_get_format_usage; return 1; }
+    eval set -- "$opts"
+    while :; do
+        case "$1" in
+            --help) __ssl_get_format_usage; return 1 ;;
+            --) shift; break ;;
+            *) __ssl_get_format_usage; return 1 ;;
+        esac
+    done
+    local certificate="$1"
+
+    # Input Validation
+    [[ -z $certificate ]] && { __ssl_get_format_usage; return 1; }
+
+    # Function
+    openssl x509 -in $certificate -noout >/dev/null 2>&1 && {
+        echo "pem"
+        return 0
+    }
+    openssl x509 -in $certificate -inform der -noout >/dev/null 2>&1 && {
+            echo "der"
+            return 0
+    }
+    openssl pkcs7 -in $certificate -noout && {
+            echo "pkcs7"
+            return 0
+    }
+    local ext="${certificate##*.}"
+    echo "$ext" | grep -i "p12|pfx" && {
+        echo "pkcs12"
+        return 0
+    }
+    echo "unknown extension '$ext'" >&2
+    return 1
+}
+
 ssl_read_csr() {
     if [[ -z $1 ]]; then
         echo "read_csr: missing parameter(s)" >&2
@@ -18,6 +69,10 @@ ssl_read_pem() {
         return 1
     fi
     openssl x509 -in $1 -text -noout
+}
+
+ssl_read_pkcs7() {
+    openssl pkcs7 -in $1 -print_certs | openssl x509 -text -noout
 }
 
 ssl_read_p12() {
@@ -191,4 +246,25 @@ ssl_get_san_pem() {
     fi
     local CRT=$1
     openssl x509 -ext subjectAltName -noout -in $CRT | tail -n -1 | sed 's/, DNS:/ /g' | sed 's/\s*DNS://'
+}
+
+ssl_keystore_contains_certificate() {
+    if [[ -z $2 ]]; then
+        echo "keystore_contains_certificate: missing parameter(s)" >&2
+        echo "usage: keystore_contains_certificate <keystore> <certificate>" >&2
+        echo "example: keystore_contains_certificate keystore.jks trust.crt" >&2
+        return 255
+    fi
+    local KEYSTORE=$1
+    local CERT=$2
+    local KEYTOOL=keytool
+    if [[ -n $JAVA_HOME ]]; then
+        local KEYTOOL=$JAVA_HOME/bin/keytool
+    fi
+    if ! $KEYTOOL -printcert -v -file $CERT > /dev/null; then
+        echo "certificate $CERT could not be read by keytool" >&2
+        return 255
+    fi
+    local FINGERPRINT=$($KEYTOOL -printcert -v -file $CERT | grep "SHA256:" | cut -f3 -d " ")
+    $KEYTOOL -list -v -keystore $KEYSTORE -storepass changeit | grep -Fq "$FINGERPRINT"
 }
