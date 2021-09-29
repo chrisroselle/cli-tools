@@ -5,6 +5,7 @@ function docker-cli-tools($data = $tmp, $command = $null) {
         docker run -it `
             --mount "type=bind,source=${PSScriptRoot}\..\..,target=/cli-tools" `
             --mount "type=bind,source=${data},target=/data" `
+            --mount "type=bind,source=${git},target=/git" `
             --mount "type=bind,source=${notes},target=/notes" `
             --mount "type=bind,source=${HOME}\.ssh,target=/root/.ssh" `
             --mount "type=bind,source=${HOME}\.kube,target=/root/.kube" `
@@ -17,6 +18,7 @@ function docker-cli-tools($data = $tmp, $command = $null) {
         docker run -it `
             --mount "type=bind,source=${PSScriptRoot}\..\..,target=/cli-tools" `
             --mount "type=bind,source=${data},target=/data" `
+            --mount "type=bind,source=${git},target=/git" `
             --mount "type=bind,source=${notes},target=/notes" `
             --mount "type=bind,source=${HOME}\.ssh,target=/root/.ssh" `
             --mount "type=bind,source=${HOME}\.kube,target=/root/.kube" `

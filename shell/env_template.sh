@@ -1,3 +1,4 @@
+git=/git
 notes=/notes
 cli_out=/data
 
