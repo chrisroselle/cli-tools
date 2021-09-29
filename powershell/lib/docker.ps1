@@ -9,6 +9,7 @@ function docker-cli-tools($data = $tmp, $command = $null) {
             --mount "type=bind,source=${HOME}\.ssh,target=/root/.ssh" `
             --mount "type=bind,source=${HOME}\.kube,target=/root/.kube" `
             --mount "type=bind,source=${HOME}\.aws,target=/root/.aws" `
+            --mount "type=bind,source=${HOME}\AppData\Roaming\GitHub CLI,target=/root/.config/gh" `
             --mount "type=bind,source=${HOME}\.bash_history_docker,target=/root/.bash_history" `
             --env SOURCE_LIST="/cli-tools/shell/main.sh" `
             chrisroselle/cli-tools:latest
@@ -20,6 +21,7 @@ function docker-cli-tools($data = $tmp, $command = $null) {
             --mount "type=bind,source=${HOME}\.ssh,target=/root/.ssh" `
             --mount "type=bind,source=${HOME}\.kube,target=/root/.kube" `
             --mount "type=bind,source=${HOME}\.aws,target=/root/.aws" `
+            --mount "type=bind,source=${HOME}\AppData\Roaming\GitHub CLI,target=/root/.config/gh" `
             --mount "type=bind,source=${HOME}\.bash_history_docker,target=/root/.bash_history" `
             --env SOURCE_LIST="/cli-tools/shell/main.sh" `
             chrisroselle/cli-tools:latest /bin/bash -c "$command"

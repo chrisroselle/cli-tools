@@ -81,6 +81,17 @@ RUN cd /tmp \
 #    && yum --disableplugin=subscription-manager install -y ./session-manager-plugin.rpm \
 #    && rm ./session-manager-plugin.rpm
 
+## install GitHub CLI
+RUN cd /tmp \
+    && curl -s https://api.github.com/repos/cli/cli/releases/latest > gh.json \
+    && FILE=$(jq -r '.assets[] | select(.name | contains("linux_amd64.tar.gz")) | .name' gh.json) \
+    && URL=$(jq -r '.assets[] | select(.name | contains("linux_amd64.tar.gz")) | .browser_download_url' gh.json) \
+    && curl -LJs $URL -o $FILE \
+    && tar xzf $FILE \
+    && mv ${FILE%.tar.gz}/bin/gh /usr/local/bin/gh \
+    && chmod +x /usr/local/bin/gh \
+    && rm -r ./*
+
 # update bash profile
 RUN echo "if [[ -n \"\$SOURCE_LIST\" ]]; then" >> /root/.bashrc \
     && echo "    for f in \$SOURCE_LIST; do" >> /root/.bashrc \
