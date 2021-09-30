@@ -7,10 +7,10 @@
 
 ssl_make_root_certificate() {
     if [[ -z $1 ]]; then
-        echo "make_root_certificate: missing parameter(s)" >&2
-        echo "usage: make_root_certificate <common_name> [<file_name>]" >&2
-        echo "example: make_root_certificate 'My Example Root CA'" >&2
-        echo "example: make_root_certificate 'My Example Root CA' root" >&2
+        echo "ssl_make_root_certificate: missing parameter(s)" >&2
+        echo "usage: ssl_make_root_certificate <common_name> [<file_name>]" >&2
+        echo "example: ssl_make_root_certificate 'My Example Root CA'" >&2
+        echo "example: ssl_make_root_certificate 'My Example Root CA' root" >&2
         return 1
     fi
     local CN=$1
@@ -24,9 +24,9 @@ ssl_make_root_certificate() {
 
 ssl_make_intermediate_certificate() {
     if [[ -z $3 ]]; then
-        echo "make_intermediate_certificate: missing parameter(s)" >&2
-        echo "usage: make_intermediate_certificate <signing_certificate> <signing_key> <common_name> [<file_name>]" >&2
-        echo "example: make_intermediate_certificate root.crt root.key 'My Example Intermediate CA' intermediate" >&2
+        echo "ssl_make_intermediate_certificate: missing parameter(s)" >&2
+        echo "usage: ssl_make_intermediate_certificate <signing_certificate> <signing_key> <common_name> [<file_name>]" >&2
+        echo "example: ssl_make_intermediate_certificate root.crt root.key 'My Example Intermediate CA' intermediate" >&2
         return 1
     fi
     local SIGNING_CERT=$1
@@ -58,9 +58,9 @@ EOF
 
 ssl_make_signed_certificate() {
     if [[ -z $3 ]]; then
-        echo "make_signed_certificate: missing parameter(s)" >&2
-        echo "usage: make_signed_certificate <signing_certificate> <signing_key> <common_name> [<alternative_name> ...]" >&2
-        echo "example: make_signed_certificate intermediate.crt intermediate.key example.internal www.example.internal" >&2
+        echo "ssl_make_signed_certificate: missing parameter(s)" >&2
+        echo "usage: ssl_make_signed_certificate <signing_certificate> <signing_key> <common_name> [<alternative_name> ...]" >&2
+        echo "example: ssl_make_signed_certificate intermediate.crt intermediate.key example.internal www.example.internal" >&2
         return 1
     fi
     local SIGNING_CERT=$1
@@ -97,9 +97,9 @@ EOF
 
 ssl_make_self_signed_certificate() {
     if [[ -z $1 ]]; then
-        echo "make_self_signed_certificate: missing parameter(s)" >&2
-        echo "usage: make_self_signed_certificate <common_name> [<alternative_name> ...]" >&2
-        echo "example: make_self_signed_certificate example.internal www.example.internal" >&2
+        echo "ssl_make_self_signed_certificate: missing parameter(s)" >&2
+        echo "usage: ssl_make_self_signed_certificate <common_name> [<alternative_name> ...]" >&2
+        echo "example: ssl_make_self_signed_certificate example.internal www.example.internal" >&2
         return 1
     fi
     local CN=$1

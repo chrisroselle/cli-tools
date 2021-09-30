@@ -234,9 +234,9 @@ ssl_get_certificate()  {
 
 ssl_get_expiration_pem() {
     if [[ -z $1 ]]; then
-        echo "get_expiration_pem: missing parameter(s)" >&2
-        echo "usage: get_expiration_pem <pem_encoded_certificate>" >&2
-        echo "example: get_expiration_pem certificate.crt" >&2
+        echo "ssl_get_expiration_pem: missing parameter(s)" >&2
+        echo "usage: ssl_get_expiration_pem <pem_encoded_certificate>" >&2
+        echo "example: ssl_get_expiration_pem certificate.crt" >&2
         return 1
     fi
     local CRT=$1
@@ -248,9 +248,9 @@ ssl_get_expiration_pem() {
 
 ssl_get_san_pem() {
     if [[ -z $1 ]]; then
-        echo "get_san_pem: missing parameter(s)" >&2
-        echo "usage: get_san_pem <pem_encoded_certificate>" >&2
-        echo "example: get_san_pem certificate.crt" >&2
+        echo "ssl_get_san_pem: missing parameter(s)" >&2
+        echo "usage: ssl_get_san_pem <pem_encoded_certificate>" >&2
+        echo "example: ssl_get_san_pem certificate.crt" >&2
         return 1
     fi
     local CRT=$1
@@ -259,9 +259,9 @@ ssl_get_san_pem() {
 
 ssl_keystore_contains_certificate() {
     if [[ -z $2 ]]; then
-        echo "keystore_contains_certificate: missing parameter(s)" >&2
-        echo "usage: keystore_contains_certificate <keystore> <certificate>" >&2
-        echo "example: keystore_contains_certificate keystore.jks trust.crt" >&2
+        echo "ssl_keystore_contains_certificate: missing parameter(s)" >&2
+        echo "usage: ssl_keystore_contains_certificate <keystore> <certificate>" >&2
+        echo "example: ssl_keystore_contains_certificate keystore.jks trust.crt" >&2
         return 255
     fi
     local KEYSTORE=$1
