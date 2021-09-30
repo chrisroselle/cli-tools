@@ -1,0 +1,29 @@
+type: function
+name: ssl_read
+description: "Read certificate and print details to console"
+options:
+- short: "p"
+  long: "password"
+  description: "(JKS or PKCS12 only) The password to the certificate or keystore"
+  flag: False
+  required: False
+- short: "a"
+  long: "alias"
+  description: "(JKS only) The alias of the certificate within the keystore"
+  flag: False
+  required: False
+- short: "s"
+  long: "server"
+  description: "Instead of reading CERTIFICATE, pull certificate from specified server in the format <host>[:<port>]. If no port is provided, 443 will be used"
+  flag: False
+  required: False
+- short: "n"
+  long: "sni"
+  description: "Use SNI when connecting to server"
+  flag: True
+  required: False
+positional:
+    long: "certificate"
+    description: "The certificate to read"
+    multiple_allowed: False
+    required: False

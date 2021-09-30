@@ -24,6 +24,6 @@ options:
   required: False
 positional:
     long: "server"
-    description: "The server to connect to in the format <host>:<port>. If no port is provided, 443 will be used"
+    description: "The server to connect to in the format <host>[:<port>]. If no port is provided, 443 will be used"
     multiple_allowed: False
     required: True

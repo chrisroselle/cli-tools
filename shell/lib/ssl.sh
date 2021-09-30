@@ -27,104 +27,109 @@ _ssl_get_format()  {
     local certificate="$1"
 
     # Input Validation
-    [[ -z $certificate ]] && { __ssl_get_format_usage; return 1; }
+    [[ -z "$certificate" ]] && { __ssl_get_format_usage; return 1; }
 
     # Function
-    openssl x509 -in $certificate -noout >/dev/null 2>&1 && {
+    openssl x509 -in "$certificate" -noout >/dev/null 2>&1 && {
         echo "pem"
         return 0
     }
-    openssl x509 -in $certificate -inform der -noout >/dev/null 2>&1 && {
-            echo "der"
-            return 0
+    openssl x509 -in "$certificate" -inform der -noout >/dev/null 2>&1 && {
+        echo "der"
+        return 0
     }
-    openssl pkcs7 -in $certificate -noout && {
-            echo "pkcs7"
-            return 0
+    openssl pkcs7 -in "$certificate" -noout >/dev/null 2>&1 && {
+        echo "pkcs7"
+        return 0
     }
-    local ext="${certificate##*.}"
-    echo "$ext" | grep -i "p12|pfx" && {
+    openssl req -text -noout -verify -in "$certificate" >/dev/null 2>&1 && {
+        echo "csr"
+        return 0
+    }
+    local pkcs12=$(openssl pkcs12 -info -in "$certificate" -passin pass:wrong -nokeys 2>&1 | tail -n 1)
+    [[ $pkcs12 == "Mac verify error: invalid password?" ]] && {
         echo "pkcs12"
         return 0
     }
-    echo "unknown extension '$ext'" >&2
+    local jks=$(keytool -list -keystore "$certificate" -storetype jks -storepass wrong)
+    [[ $jks == "keytool error: java.io.IOException: Keystore was tampered with, or password was incorrect" ]] && {
+        echo "jks"
+        return 0
+    }
+    echo "unable to infer type of '$certificate'" >&2
     return 1
 }
 
-ssl_read_csr() {
-    if [[ -z $1 ]]; then
-        echo "read_csr: missing parameter(s)" >&2
-        echo "usage: read_csr <csr_file>" >&2
-        echo "example: read_csr mydomain.com.csr" >&2
-        return 1
-    fi
-    openssl req -text -noout -verify -in $1
+_ssl_read_usage() {
+    echo "usage: ssl_read [OPTIONS] [CERTIFICATE]
+
+  CERTIFICATE                The certificate to read
+  [-a,--alias=ALIAS]         (JKS only) The alias of the certificate within the keystore
+  [-n,--sni]                 Use SNI when connecting to server (requires -s/--server)
+  [-p,--password=PASSWORD]   (JKS or PKCS12 only) The password to the certificate or keystore
+  [-s,--server=SERVER]       Instead of reading CERTIFICATE, pull certificate from specified server in
+                             the format <host>[:<port>]. If no port is provided, 443 will be used
+
+Read certificate and print details to console
+
+Examples:
+    ssl_read certificate.crt
+    ssl_read -s google.com
+    ssl_read certificate.p12 -p myPassword
+    ssl_read certificate.jks -a myAlias -p myPassword
+
+See Also:
+    ssl_get_certificate" >&2
 }
 
-ssl_read_pem() {
-    if [[ -z $1 ]]; then
-        echo "read_pem: missing parameter(s)" >&2
-        echo "usage: read_pem <pem_encoded_certificate>" >&2
-        echo "example: read_pem certificate.pem" >&2
-        return 1
-    fi
-    openssl x509 -in $1 -text -noout
-}
+ssl_read()  {
+    # Input Parsing
+    local opts
+    opts=$(getopt --options "a:np:s:" --longoptions "alias:,password:,server:,sni,help" -- "$@")
+    [[ $? != "0" ]] && { _ssl_read_usage; return 1; }
+    eval set -- "$opts"
+    local alias password server sni
+    while :; do
+        case "$1" in
+            -a|--alias) alias="$2"; shift 2 ;;
+            -n|--sni) sni="true"; shift ;;
+            -p|--password) password="$2"; shift 2 ;;
+            -s|--server) server="$2"; shift 2 ;;
+            --help) _ssl_read_usage; return 1 ;;
+            --) shift; break ;;
+            *) _ssl_read_usage; return 1 ;;
+        esac
+    done
+    local certificate="$1"
 
-ssl_read_pkcs7() {
-    openssl pkcs7 -in $1 -print_certs | openssl x509 -text -noout
-}
-
-ssl_read_p12() {
-    if [[ -z $2 ]]; then
-        echo "read_p12: missing parameter(s)" >&2
-        echo "usage: read_p12 <pkcs12_encoded_certificate> <password>" >&2
-        echo "example: read_p12 certificate.p12 mypassword" >&2
+    # Input Validation
+    [[ -z $certificate && -z $server ]] && { _ssl_read_usage; return 1; }
+    [[ -n $certificate && ! -f $certificate ]] && {
+        echo "no such file '$certificate'" >&2
         return 1
-    fi
-    ssl_read_pkcs12 $@
-}
+    }
+    [[ -n $sni ]] && sni="--sni"
+    [[ -n $server ]] && certificate="/tmp/tmp.crt"
 
-ssl_read_pfx() {
-    if [[ -z $2 ]]; then
-        echo "read_pfx: missing parameter(s)" >&2
-        echo "usage: read_pfx <pkcs12_encoded_certificate> <password>" >&2
-        echo "example: read_pfx certificate.p12 mypassword" >&2
-        return 1
-    fi
-    ssl_read_pkcs12 $@
-}
-
-ssl_read_pkcs12() {
-    if [[ -z $2 ]]; then
-        echo "read_pkcs12: missing parameter(s)" >&2
-        echo "usage: read_pkcs12 <pkcs12_encoded_certificate> <password>" >&2
-        echo "example: read_pkcs12 certificate.p12 mypassword" >&2
-        return 1
-    fi
-    local P12=$1
-    local PASS=$2
-    openssl pkcs12 -info -in "$P12" -passin pass:"$PASS" -nokeys | openssl x509 -text -noout
-}
-
-ssl_read_crt() {
-    if [[ -z $1 ]]; then
-        echo "read_crt: missing parameter(s)" >&2
-        echo "usage: read_crt <pem_encoded_certificate>" >&2
-        echo "example: read_crt certificate.crt" >&2
-        return 1
-    fi
-    ssl_read_pem $1
-}
-
-ssl_read_der() {
-    if [[ -z $1 ]]; then
-        echo "read_der: missing parameter(s)" >&2
-        echo "usage: read_der <der_encoded_certificate>" >&2
-        echo "example: read_der certificate.der" >&2
-        return 1
-    fi
-    openssl x509 -in $1 -inform der -text -noout
+    # Function
+    [[ -n $server ]] && ssl_get_certificate $sni $server -o "$certificate"
+    local format
+    format=$(_ssl_get_format "$certificate") || return 1
+    case $format in
+        csr) openssl req -text -noout -verify -in "$certificate" ;;
+        der) openssl x509 -in "$certificate" -inform der -text -noout ;;
+        jks)
+            [[ -z $alias ]] && {
+                echo "must provide -a/--alias for JKS" >&2
+                return 1
+            }
+            [[ -z $password ]] && password="changeit"
+            keytool -exportcert -rfc -alias "$alias" -keystore "$certificate" -storepass "$password" | openssl x509 -text -noout
+            ;;
+        pem) openssl x509 -in "$certificate" -text -noout ;;
+        pkcs7) openssl pkcs7 -in "$certificate" -print_certs | openssl x509 -text -noout ;;
+        pkcs12) openssl pkcs12 -info -in "$certificate" -passin pass:"$password" -nokeys | openssl x509 -text -noout ;;
+    esac
 }
 
 _ssl_check_usage() {
@@ -136,10 +141,11 @@ _ssl_check_usage() {
   [-2,--tls-1-2]   Check TLS 1.2
   [-3,--tls-1-3]   Check TLS 1.3
 
-Check whether server accepts a specific TLS version
+Check whether server accepts a specific TLS version.
 
 Examples:
-    ssl_check
+    ssl_check -0 google.com
+    ssl_check --tls-1-3 192.168.1.15:9000
 
 See Also:
     reference" >&2
@@ -181,14 +187,15 @@ ssl_check()  {
 _ssl_get_certificate_usage() {
     echo "usage: ssl_get_certificate [OPTIONS] SERVER
 
-  SERVER              The server to connect to in the format <host>[:<port>]. If no port is provided, 443 will be used
-  [-f,--full-chain]   Get full certificate chain
-  [-n,--sni]          Use SNI
+  SERVER                 The server to connect to in the format <host>[:<port>]. If no port is provided, 443 will be used
+  [-f,--full-chain]      Get full certificate chain
+  [-n,--sni]             Use SNI
+  [-o,--output=OUTPUT]   The name of the file to output to. If no name is provided, <server>.crt will be used
 
 Get SSL Certificate from remote server
 
 Examples:
-    ssl_get_certificate
+    ssl_get_certificate google.com
 
 See Also:
     reference" >&2
@@ -197,14 +204,15 @@ See Also:
 ssl_get_certificate()  {
     # Input Parsing
     local opts
-    opts=$(getopt --options "fn" --longoptions "full-chain,sni,help" -- "$@")
+    opts=$(getopt --options "fno:" --longoptions "full-chain,output:,sni,help" -- "$@")
     [[ $? != "0" ]] && { _ssl_get_certificate_usage; return 1; }
     eval set -- "$opts"
-    local full_chain sni
+    local full_chain output sni
     while :; do
         case "$1" in
             -f|--full-chain) full_chain="true"; shift ;;
             -n|--sni) sni="true"; shift ;;
+            -o|--output) output="$2"; shift 2 ;;
             --help) _ssl_get_certificate_usage; return 1 ;;
             --) shift; break ;;
             *) _ssl_get_certificate_usage; return 1 ;;
@@ -218,9 +226,10 @@ ssl_get_certificate()  {
     local options
     [[ -n $full_chain ]] && options+=" -showcerts"
     [[ -n $sni ]] && options+=" -servername ${server%:*}"
+    [[ -z $output ]] && output="${server%:*}.crt"
 
     # Function
-    openssl s_client -connect $server $options </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ${server%:*}.crt
+    openssl s_client -connect $server $options </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > "$output"
 }
 
 ssl_get_expiration_pem() {
