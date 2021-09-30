@@ -22,6 +22,14 @@ options:
   description: "Use SNI when connecting to server"
   flag: True
   required: False
+- long: "expiration"
+  description: "Print the expiration date only"
+  flag: True
+  required: False
+- long: "san"
+  description: "Print the subject alternative names only"
+  flag: True
+  required: False
 positional:
     long: "certificate"
     description: "The certificate to read"
