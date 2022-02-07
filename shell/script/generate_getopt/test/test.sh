@@ -10,10 +10,11 @@ failure for input '$@'" >&2
 }
 
 testf_pass() {
+    test_count=$((test_count + 1))
     local expected="$1"
     shift
     (set -o posix; set | egrep -v "^rcode") > env.before
-    "$@" 2>/dev/null >result.txt || { fail "expected function to run but it did not" "$@"; rm env.before result.txt; return; }
+    "$@" 2>/dev/null >result.txt || { fail "expected script or function to run but it did not" "$@"; rm env.before result.txt; return; }
     [[ $(cat result.txt) != $expected ]] && fail "actual output did not match expected
 actual:
 $result
@@ -27,9 +28,11 @@ $expected
 }
 
 testf_fail() {
-    "$@" 2>/dev/null && fail "expected function to fail but it did not" "$@"
+    test_count=$((test_count + 1))
+    "$@" 2>/dev/null && fail "expected script or function to fail but it did not" "$@"
 }
 
+test_count=0
 rcode=0
 
 python -m venv test-venv
@@ -151,6 +154,8 @@ sed -i '/implement_me/a \
 
 sed -i '/implement_me/d' tmp.sh
 
+chmod 700 tmp.sh
+
 testf_fail ./tmp.sh
 testf_fail ./tmp.sh -w testwidget
 testf_fail ./tmp.sh --widget testwidget
@@ -203,6 +208,8 @@ sed -i '/implement_me/a \
 
 sed -i '/implement_me/d' tmp.sh
 
+chmod 700 tmp.sh
+
 testf_fail ./tmp.sh
 testf_fail ./tmp.sh -w testwidget
 testf_fail ./tmp.sh --widget testwidget
@@ -247,6 +254,6 @@ testf_pass "$expected" ./tmp.sh --thing testthing --widget testwidget testinput 
 rm tmp.sh
 rm -r test-venv
 
-(( rcode > 0 )) && echo "$rcode test cases failed" >&2
-(( rcode == 0 )) && echo "all test cases passed"
+(( rcode > 0 )) && echo "$rcode/$test_count test cases failed" >&2
+echo "$((test_count-rcode))/$test_count test cases passed"
 exit $rcode

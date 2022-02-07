@@ -7,6 +7,10 @@ import yaml
 class GetoptType(Enum):
     FUNCTION = 'function'
     SCRIPT = 'script'
+    
+class UsageType(Enum):
+    STANDARD = 'standard'
+    CASE = 'case'
 
 
 class Option:
@@ -132,11 +136,14 @@ def p(o, indent=0):
         print(' ' * (indent * 4) + line)
 
 
-def usage_statement():
+def usage_statement(usage_type):
     if getopt_type is GetoptType.SCRIPT:
         return 'usage'
     if getopt_type is GetoptType.FUNCTION:
-        return f'{{ {usage_name}; return 1; }}'
+        if usage_type is UsageType.STANDARD:
+            return f'{{ {usage_name}; return 1; }}'
+        elif usage_type is UsageType.CASE:
+            return f'{usage_name}; return 1'
 
 
 with open(args.configuration, 'r') as cfg_yaml:
@@ -172,9 +179,9 @@ if 'positional' in cfg:
     positional_usage.append(('  ' + positional.long.upper(), positional.description))
     if positional.required:
         if positional.multiple:
-            validation_statements.append(f'[[ -z "$1" ]] && {usage_statement()}')
+            validation_statements.append(f'[[ -z "$1" ]] && {usage_statement(UsageType.STANDARD)}')
         else:
-            validation_statements.append(f'[[ -z ${positional.variable} ]] && {usage_statement()}')
+            validation_statements.append(f'[[ -z ${positional.variable} ]] && {usage_statement(UsageType.STANDARD)}')
 
 
 
@@ -190,7 +197,7 @@ for o in cfg['options']:
     long_options.append(opt.getopt_long)
 
     if opt.required:
-        validation_statements.append(f'[[ -z ${opt.variable} ]] && {usage_statement()}')
+        validation_statements.append(f'[[ -z ${opt.variable} ]] && {usage_statement(UsageType.STANDARD)}')
         required_option_usage.append(opt.usage)
     else:
         optional_option_usage.append(opt.usage)
@@ -232,7 +239,7 @@ print(f'''{main_name}()  {{
     # Input Parsing
     local opts
     opts=$(getopt --options "{"".join(sorted(short_options))}" --longoptions "{",".join(sorted(long_options) + ["help"])}" -- "$@")
-    [[ $? != "0" ]] && {usage_statement()}
+    [[ $? != "0" ]] && {usage_statement(UsageType.STANDARD)}
     eval set -- "$opts"''')
 if len(variables_with_no_default) > 0:
     print(f'    local {" ".join(sorted(variables_with_no_default))}')
@@ -243,9 +250,9 @@ print('''    while :; do
         case "$1" in''')
 for c in sorted(case_statements):
     print(f'            {c}')
-print(f'''            --help) {usage_statement()[2:-3]} ;;
+print(f'''            --help) {usage_statement(UsageType.CASE)} ;;
             --) shift; break ;;
-            *) {usage_statement()[2:-3]} ;;
+            *) {usage_statement(UsageType.CASE)} ;;
         esac
     done''')
 if positional and not positional.multiple:
