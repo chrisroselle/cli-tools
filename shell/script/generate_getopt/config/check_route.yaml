@@ -1,0 +1,9 @@
+type: function
+name: check_route
+description: "Check network route using telnet"
+options: []
+positional:
+    long: "host:port"
+    description: "host and port to check"
+    multiple_allowed: True
+    required: True

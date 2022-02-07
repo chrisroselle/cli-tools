@@ -49,3 +49,44 @@ hist()  {
         history | mgrep "$@" | tail -n $((num_results + 1)) | head -n -1
     fi
 }
+
+_check_route_usage() {
+    echo "usage: check_route HOST:PORT [HOST:PORT ...]
+
+Check network route using telnet
+
+Note that no data is exchanged over the connection, so devices which inspect request content
+before deciding whether to allow or deny a connection may give a false positive success, such
+as a corporate firewall
+
+Examples:
+    check_route google.com:443 espn.com:443" >&2
+}
+
+check_route()  {
+    # Input Parsing
+    local opts
+    opts=$(getopt --options "" --longoptions "help" -- "$@")
+    [[ $? != "0" ]] && { _check_route_usage; return 1; }
+    eval set -- "$opts"
+    while :; do
+        case "$1" in
+            --help) _check_route_usage; return 1 ;;
+            --) shift; break ;;
+            *) _check_route_usage; return 1 ;;
+        esac
+    done
+
+    # Input Validation
+    [[ -z "$1" ]] && { _check_route_usage; return 1; }
+
+    # Function
+    local pair host port
+    local returncode=0
+    for pair in "$@"; do
+        host=${pair%:*}
+        port=${pair#*:}
+        echo -e '\x1dclose' | telnet "$host" "$port" || returncode=$((returncode + 1))
+    done
+    return $returncode
+}
