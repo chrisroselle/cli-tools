@@ -2,7 +2,7 @@ function docker-cli-tools($data = $tmp, $command = $null) {
     # ensure bash_history exists
     $null | out-file -encoding ascii -append ${HOME}\.bash_history_docker
     if ($null -eq $command) {
-        docker run -it `
+        docker run --rm -it `
             --mount "type=bind,source=${PSScriptRoot}\..\..,target=/cli-tools" `
             --mount "type=bind,source=${data},target=/data" `
             --mount "type=bind,source=${git},target=/git" `
@@ -15,7 +15,7 @@ function docker-cli-tools($data = $tmp, $command = $null) {
             --env SOURCE_LIST="/cli-tools/shell/main.sh" `
             chrisroselle/cli-tools:latest
     } else {
-        docker run -it `
+        docker run --rm -it `
             --mount "type=bind,source=${PSScriptRoot}\..\..,target=/cli-tools" `
             --mount "type=bind,source=${data},target=/data" `
             --mount "type=bind,source=${git},target=/git" `
