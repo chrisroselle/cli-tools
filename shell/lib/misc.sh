@@ -1,3 +1,11 @@
+help_misc() {
+    echo "misc.sh:"
+    echo "---------"
+    echo "hist                      - search command history"
+    echo "-------shorthand:"
+    echo "mgrep                     - grep -i '\$1' | grep -i '\$2' | ..."
+}
+
 mgrep() {
     [[ -z $1 ]] && { echo "usage: $FUNCNAME <pattern> ..." >&2; return 1; }
     local command="grep -i '$1'"

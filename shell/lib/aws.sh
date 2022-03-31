@@ -1,5 +1,13 @@
 #!/bin/bash
 
+help_aws() {
+    echo "aws.sh:"
+    echo "-------shorthand:"
+    echo "asp           export AWS_PROFILE='\$1' AWS_DEFAULT_REGION='\$2'"
+    echo "agp           echo \$AWS_PROFILE \$AWS_DEFAULT_REGION"
+    echo "alp           aws configure list-profiles"
+}
+
 agp() {
     echo $AWS_PROFILE $AWS_DEFAULT_REGION
 }
@@ -14,5 +22,5 @@ asp() {
 }
 
 alp() {
-    aws configure list-profile
+    aws configure list-profiles
 }

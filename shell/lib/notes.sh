@@ -35,7 +35,7 @@ notes_or() {
     [[ -z $1 ]] && { echo "usage: $FUNCNAME <content_search> ..." >&2; return 1; }
     local params=""
     for search_term in "$@"; do
-            params+=" -e '$search_term'"
+        params+=" -e '$search_term'"
     done
     grep -iR $params $notes
 }
