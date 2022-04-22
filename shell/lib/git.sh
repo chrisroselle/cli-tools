@@ -1,3 +1,12 @@
+help_git() {
+    echo "git.sh:"
+    echo "---------"
+    echo "g_feature                                 - create a new feature branch"
+    echo "g_pr_feature                              - push current branch and open pr"
+    echo "--shorthand:"
+    echo "gs            git status"
+}
+
 _g_is_clean() {
     local status
     status=$(git status --short)
@@ -23,6 +32,10 @@ _g_default_branch() {
         default_branch="main"
     fi
     echo "$default_branch"
+}
+
+gs() {
+    git status
 }
 
 g_feature() {

@@ -5,8 +5,17 @@
 # https://www.ssl.com/blogs/398-day-browser-limit-for-ssl-tls-certificates-begins-september-1-2020/
 # https://security.stackexchange.com/questions/70495/ssl-certificate-is-passphrase-necessary-and-how-does-apache-know-it
 
+help_ssl-selfsigned() {
+    echo "ssl-selfsigned.sh:"
+    echo "---------"
+    echo "ssl_make_root_certificate                 - Create self-signed root certificate"
+    echo "ssl_make_intermediate_certificate         - Create self-signed intermediate certificate"
+    echo "ssl_make_signed_certificate               - Create self-signed leaf certificate"
+    echo "ssl_make_self_signed_certificate          - Create standalone self-signed leaf certificate"
+}
+
 ssl_make_root_certificate() {
-    if [[ -z $1 ]]; then
+    if [[ $1 == "--help" || -z $1 ]]; then
         echo "ssl_make_root_certificate: missing parameter(s)" >&2
         echo "usage: ssl_make_root_certificate <common_name> [<file_name>]" >&2
         echo "example: ssl_make_root_certificate 'My Example Root CA'" >&2
@@ -23,7 +32,7 @@ ssl_make_root_certificate() {
 }
 
 ssl_make_intermediate_certificate() {
-    if [[ -z $3 ]]; then
+    if [[ $1 == "--help" || -z $3 ]]; then
         echo "ssl_make_intermediate_certificate: missing parameter(s)" >&2
         echo "usage: ssl_make_intermediate_certificate <signing_certificate> <signing_key> <common_name> [<file_name>]" >&2
         echo "example: ssl_make_intermediate_certificate root.crt root.key 'My Example Intermediate CA' intermediate" >&2
@@ -57,7 +66,7 @@ EOF
 }
 
 ssl_make_signed_certificate() {
-    if [[ -z $3 ]]; then
+    if [[ $1 == "--help" || -z $3 ]]; then
         echo "ssl_make_signed_certificate: missing parameter(s)" >&2
         echo "usage: ssl_make_signed_certificate <signing_certificate> <signing_key> <common_name> [<alternative_name> ...]" >&2
         echo "example: ssl_make_signed_certificate intermediate.crt intermediate.key example.internal www.example.internal" >&2
@@ -96,7 +105,7 @@ EOF
 }
 
 ssl_make_self_signed_certificate() {
-    if [[ -z $1 ]]; then
+    if [[ $1 == "--help" || -z $1 ]]; then
         echo "ssl_make_self_signed_certificate: missing parameter(s)" >&2
         echo "usage: ssl_make_self_signed_certificate <common_name> [<alternative_name> ...]" >&2
         echo "example: ssl_make_self_signed_certificate example.internal www.example.internal" >&2

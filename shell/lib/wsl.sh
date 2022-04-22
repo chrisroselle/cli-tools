@@ -18,11 +18,11 @@ np() {
 }
 
 wsl_configs() {
-    if [[ -z $win_username ]]; then
-        echo "\$win_username is not set - please set in $_DIR/env.sh"
+    if [[ -z $WIN_USERNAME ]]; then
+        echo "\$WIN_USERNAME is not set - please set in $_DIR/env.sh"
         return 1
     fi
-    local wdir="/mnt/c/users/$win_username"
+    local wdir="/mnt/c/users/$WIN_USERNAME"
     if [[ -f "$wdir/.aws/config" ]]; then
         mkdir ~/.aws
         cp "$wdir/.aws/config" ~/.aws/
