@@ -6,8 +6,10 @@ wsl_patch() {
     update_helm
     update_node
     update_maven
+    update_aws
     update_codefresh
     update_pulumi
+    update_github
 }
 
 np() {
@@ -92,6 +94,19 @@ update_maven() {
     rm -rf /tmp/maven
 }
 
+update_aws() {
+    (
+        mkdir /tmp/aws \
+            && cd /tmp/aws \
+            && curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O \
+            && unzip awscli-exe-linux-x86_64.zip \
+            && sudo ./aws/install --update \
+            && curl -s "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm" \
+            && sudo dnf install -y ./session-manager-plugin.rpm
+    )
+    rm -rf /tmp/aws
+}
+
 update_codefresh() {
     (
         mkdir /tmp/codefresh \
@@ -120,7 +135,7 @@ update_pulumi() {
 
 update_github() {
     (
-        mkdir /tmp/github
+        mkdir /tmp/github \
             && cd /tmp/github \
             && GITHUB_URL=$(curl -s https://api.github.com/repos/cli/cli/releases/latest | jq -r '.assets[] | select(.name | contains("linux_amd64.tar.gz")) | .browser_download_url') \
             && curl -LJs "$GITHUB_URL" -o "github.tar.gz" \
