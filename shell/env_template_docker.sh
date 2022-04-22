@@ -7,4 +7,4 @@ export HISTFILESIZE=99999
 export HISTIGNORE="exit"
 export HISTCONTROL="erasedups"
 
-python $_ROOT/scripts/dedup.py ~/.bash_history
+python $_DIR/scripts/dedup.py ~/.bash_history
