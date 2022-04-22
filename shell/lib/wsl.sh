@@ -10,7 +10,7 @@ wsl_patch() {
     _update_codefresh
     _update_pulumi
     _update_github
-    date +%Y-%m-%d > /tmp/last_patch.txt
+    date +%s > /tmp/last_patch.txt
 }
 
 np() {
