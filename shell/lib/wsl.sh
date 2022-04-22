@@ -1,15 +1,15 @@
 wsl_patch() {
     sudo dnf -y update
     sudo pip install --upgrade pip
-    update_yq
-    update_kubectl
-    update_helm
-    update_node
-    update_maven
-    update_aws
-    update_codefresh
-    update_pulumi
-    update_github
+    _update_yq
+    _update_kubectl
+    _update_helm
+    _update_node
+    _update_maven
+    _update_aws
+    _update_codefresh
+    _update_pulumi
+    _update_github
 }
 
 np() {
@@ -43,17 +43,17 @@ wsl_configs() {
     fi
 }
 
-update_yq() {
+_update_yq() {
     sudo curl -LJs $(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4) -o /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
 }
 
-update_kubectl() {
+_update_kubectl() {
     sudo curl -sL "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
         && sudo chmod +x /usr/local/bin/kubectl
 }
 
-update_helm() {
+_update_helm() {
     (
         mkdir /tmp/helm \
             && cd /tmp/helm \
@@ -66,7 +66,7 @@ update_helm() {
     rm -rf /tmp/helm
 }
 
-update_node() {
+_update_node() {
     (
         mkdir /tmp/node \
         && cd /tmp/node \
@@ -79,7 +79,7 @@ update_node() {
     rm -rf /tmp/node
 }
 
-update_maven() {
+_update_maven() {
     local MAVEN_VERSION=$(curl -s https://apache.osuosl.org/maven/maven-3/ | grep "<img" | tail -n 1 | cut -f3 -d '>' | cut -f1 -d '/')
     [[ -d /usr/local/apache-maven-${MAVEN_VERSION} ]] && return 0
     (
@@ -94,7 +94,7 @@ update_maven() {
     rm -rf /tmp/maven
 }
 
-update_aws() {
+_update_aws() {
     (
         mkdir /tmp/aws \
             && cd /tmp/aws \
@@ -107,7 +107,7 @@ update_aws() {
     rm -rf /tmp/aws
 }
 
-update_codefresh() {
+_update_codefresh() {
     (
         mkdir /tmp/codefresh \
             && cd /tmp/codefresh \
@@ -120,7 +120,7 @@ update_codefresh() {
     rm -rf /tmp/codefresh
 }
 
-update_pulumi() {
+_update_pulumi() {
     (
         mkdir /tmp/pulumi/ \
             && cd /tmp/pulumi \
@@ -133,7 +133,7 @@ update_pulumi() {
     rm -rf /tmp/pulumi
 }
 
-update_github() {
+_update_github() {
     (
         mkdir /tmp/github \
             && cd /tmp/github \
