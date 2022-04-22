@@ -1,9 +1,9 @@
 help_misc() {
     echo "misc.sh:"
     echo "---------"
-    echo "hist                      - search command history"
-    echo "-------shorthand:"
-    echo "mgrep                     - grep -i '\$1' | grep -i '\$2' | ..."
+    echo "hist                                      - search command history"
+    echo "--shorthand:"
+    echo "mgrep         grep -i '\$1' | grep -i '\$2' | ..."
 }
 
 mgrep() {

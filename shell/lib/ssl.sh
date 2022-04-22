@@ -1,5 +1,14 @@
 #!/bin/bash
 
+help_ssl() {
+    echo "ssl.sh:"
+    echo "---------"
+    echo "ssl_read                                  - Read certificate and print details to console"
+    echo "ssl_check                                 - Check whether server accepts a specific TLS version"
+    echo "ssl_get_certificate                       - Get SSL Certificate from remote server"
+    echo "ssl_keystore_contains_certificate         - Check if a java keystore contains a certificate"
+}
+
 __ssl_get_format_usage() {
     echo "usage: _ssl_get_format [OPTIONS] CERTIFICATE
 
@@ -254,7 +263,7 @@ ssl_get_certificate()  {
 }
 
 ssl_keystore_contains_certificate() {
-    if [[ -z $2 ]]; then
+    if [[ $1 == "--help" || -z $2 ]]; then
         echo "ssl_keystore_contains_certificate: missing parameter(s)" >&2
         echo "usage: ssl_keystore_contains_certificate <keystore> <certificate>" >&2
         echo "example: ssl_keystore_contains_certificate keystore.jks trust.crt" >&2

@@ -1,10 +1,12 @@
 help_notes() {
-    echo "note <name>               - open note with matching name. print possible notes if more than one matches"
-    echo "notes <search> ...        - search all notes (case insensitive - multiple terms performs 'and' match)"
-    echo "notes_or <search> ...     - search all notes (case insensitive - multiple terms performs 'or' match)"
-    echo "new_note <name>           - create a new note"
-    echo "new_meeting_note <name>   - create a new meeting note in ${notes}/meeting-note"
-    echo "todo                      - open todo list"
+    echo "notes.sh:"
+    echo "---------"
+    echo "note <name>                               - open note with matching name. print possible notes if more than one matches"
+    echo "notes <search> ...                        - search all notes (case insensitive - multiple terms performs 'and' match)"
+    echo "notes_or <search> ...                     - search all notes (case insensitive - multiple terms performs 'or' match)"
+    echo "new_note <name>                           - create a new note"
+    echo "new_meeting_note <name>                   - create a new meeting note in ${notes}/meeting-note"
+    echo "todo                                      - open todo list"
 }
 
 note() {

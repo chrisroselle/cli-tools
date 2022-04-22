@@ -1,6 +1,6 @@
-help_k8s_cr() {
+help_k8s() {
     echo "k8s.sh:"
-    echo "-------shorthand:"
+    echo "--shorthand:"
     echo "k             kubectl"
     echo "kuc           kubectl config use-context"
     echo "kgc           kubectl config get-contexts"
