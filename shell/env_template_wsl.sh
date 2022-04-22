@@ -9,4 +9,4 @@ export HISTCONTROL="erasedups"
 
 #export BROWSER='/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 export BROWSER='/mnt/c/Program Files/Mozilla Firefox/firefox.exe'
-python $_DIR/scripts/dedup.py ~/.bash_history
+python $_DIR/script/dedup.py ~/.bash_history
