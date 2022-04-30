@@ -10,6 +10,8 @@ wsl_patch() {
     _update_codefresh
     _update_pulumi
     _update_github
+    _update_ripgrep
+    _update_gron
     date +%s > /tmp/last_patch.txt
 }
 
@@ -45,16 +47,19 @@ wsl_configs() {
 }
 
 _update_yq() {
+    # yq --version
     sudo curl -LJs $(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4) -o /usr/local/bin/yq
     sudo chmod +x /usr/local/bin/yq
 }
 
 _update_kubectl() {
+    # kubectl version
     sudo curl -sL "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
         && sudo chmod +x /usr/local/bin/kubectl
 }
 
 _update_helm() {
+    # helm version
     (
         mkdir /tmp/helm \
             && cd /tmp/helm \
@@ -68,6 +73,8 @@ _update_helm() {
 }
 
 _update_node() {
+    # node --version
+    # yarn --version
     (
         mkdir /tmp/node \
         && cd /tmp/node \
@@ -81,6 +88,7 @@ _update_node() {
 }
 
 _update_maven() {
+    # mvn --version
     local MAVEN_VERSION=$(curl -s https://apache.osuosl.org/maven/maven-3/ | grep "<img" | tail -n 1 | cut -f3 -d '>' | cut -f1 -d '/')
     [[ -d /usr/local/apache-maven-${MAVEN_VERSION} ]] && return 0
     (
@@ -96,6 +104,7 @@ _update_maven() {
 }
 
 _update_aws() {
+    # aws --version
     (
         mkdir /tmp/aws \
             && cd /tmp/aws \
@@ -109,6 +118,7 @@ _update_aws() {
 }
 
 _update_codefresh() {
+    # codefresh version
     (
         mkdir /tmp/codefresh \
             && cd /tmp/codefresh \
@@ -122,6 +132,7 @@ _update_codefresh() {
 }
 
 _update_pulumi() {
+    # pulumi version
     (
         mkdir /tmp/pulumi/ \
             && cd /tmp/pulumi \
@@ -135,6 +146,7 @@ _update_pulumi() {
 }
 
 _update_github() {
+    # gh version
     (
         mkdir /tmp/github \
             && cd /tmp/github \
@@ -147,3 +159,30 @@ _update_github() {
     rm -rf /tmp/github
 }
 
+_update_ripgrep() {
+    # rg --version
+    (
+        mkdir /tmp/ripgrep \
+            && cd /tmp/ripgrep \
+            && RIPGREP_URL=$(curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq -r '.assets[] | select(.name | contains("linux-musl")) | .browser_download_url') \
+            && curl -LJs "$RIPGREP_URL" -o "ripgrep.tar.gz" \
+            && tar xzf "ripgrep.tar.gz" \
+            && mv ripgrep-*/rg /usr/local/bin/rg \
+            && chmod +x /usr/local/bin/rg
+    )
+    rm -rf /tmp/ripgrep
+}
+
+_update_gron() {
+    # gron --version
+    (
+        mkdir /tmp/gron \
+            && cd /tmp/gron \
+            && GRON_URL=$(curl -s https://api.github.com/repos/tomnomnom/gron/releases/latest | jq -r '.assets[] | select(.name | contains("linux-amd64")) | .browser_download_url') \
+            && curl -LJs "$GRON_URL" -o "gron.tar.gz" \
+            && tar xzf "gron.tar.gz" \
+            && mv gron /usr/local/bin/gron \
+            && chmod +x /usr/local/bin/rg
+    )
+    rm -rf /tmp/gron
+}
