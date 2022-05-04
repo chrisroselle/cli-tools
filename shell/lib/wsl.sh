@@ -167,8 +167,8 @@ _update_ripgrep() {
             && RIPGREP_URL=$(curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | jq -r '.assets[] | select(.name | contains("linux-musl")) | .browser_download_url') \
             && curl -LJs "$RIPGREP_URL" -o "ripgrep.tar.gz" \
             && tar xzf "ripgrep.tar.gz" \
-            && mv ripgrep-*/rg /usr/local/bin/rg \
-            && chmod +x /usr/local/bin/rg
+            && sudo mv ripgrep-*/rg /usr/local/bin/rg \
+            && sudo chmod +x /usr/local/bin/rg
     )
     rm -rf /tmp/ripgrep
 }
@@ -181,8 +181,8 @@ _update_gron() {
             && GRON_URL=$(curl -s https://api.github.com/repos/tomnomnom/gron/releases/latest | jq -r '.assets[] | select(.name | contains("linux-amd64")) | .browser_download_url') \
             && curl -LJs "$GRON_URL" -o "gron.tar.gz" \
             && tar xzf "gron.tar.gz" \
-            && mv gron /usr/local/bin/gron \
-            && chmod +x /usr/local/bin/rg
+            && sudo mv gron /usr/local/bin/gron \
+            && sudo chmod +x /usr/local/bin/gron
     )
     rm -rf /tmp/gron
 }
