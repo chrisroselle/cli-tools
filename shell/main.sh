@@ -23,6 +23,8 @@ help__() {
     echo
     help_ssl-selfsigned
     echo
+    help_wsl
+    echo
     help_scripts
 }
 

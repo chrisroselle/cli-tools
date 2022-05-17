@@ -1,6 +1,16 @@
+help_wsl() {
+    echo "wsl.sh:"
+    echo "---------"
+    echo "wsl_patch                                 - Install software updates"
+    echo "wsl_configs                               - Pull latest config updates from windows home to WSL home"
+    echo "--shorthand:"
+    echo "np            notepad++.exe"
+}
+
 wsl_patch() {
     sudo dnf -y update
     sudo pip install --upgrade pip
+    pip install --upgrade pipx
     pipx upgrade-all
     _update_yq
     _update_kubectl
