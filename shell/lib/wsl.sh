@@ -81,8 +81,9 @@ _update_kubectl() {
 }
 
 _update_helm() {
-    echo "updating helm..."
     # helm version
+    echo "updating helm..."
+    local RET=0
     (
         set -euo pipefail
         mkdir /tmp/helm
@@ -92,14 +93,16 @@ _update_helm() {
         tar xzf helm.tar.gz
         sudo mv linux-amd64/helm /usr/local/bin/helm
         sudo chmod +x /usr/local/bin/helm
-    )
+    ) || RET=1
     rm -rf /tmp/helm
+    return ${RET:?}
 }
 
 _update_node() {
-    echo "updating node..."
     # node --version
     # yarn --version
+    echo "updating node..."
+    local RET=0
     (
         set -euo pipefail
         mkdir /tmp/node
@@ -109,14 +112,17 @@ _update_node() {
         sudo tar -xJf "nodejs.tar.xz" -C /usr/local --strip-components=1 --no-same-owner
         sudo rm /usr/local/CHANGELOG.md /usr/local/LICENSE /usr/local/README.md nodejs.tar.xz
         sudo npm install --global yarn
-    )
+    ) || RET=1
     rm -rf /tmp/node
+    return ${RET:?}
 }
 
 _update_maven() {
-    echo "updating maven..."
     # mvn --version
-    local MAVEN_VERSION=$(curl -s https://apache.osuosl.org/maven/maven-3/ | grep "<img" | tail -n 1 | cut -f3 -d '>' | cut -f1 -d '/')
+    echo "updating maven..."
+    local RET=0
+    local MAVEN_VERSION
+    MAVEN_VERSION=$(set -o pipefail; curl -s https://apache.osuosl.org/maven/maven-3/ | grep "<img" | tail -n 1 | cut -f3 -d '>' | cut -f1 -d '/') || return 1
     [[ -d /usr/local/apache-maven-${MAVEN_VERSION} ]] && return 0
     (
         set -euo pipefail
@@ -127,13 +133,15 @@ _update_maven() {
         sudo ln -s /usr/local/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/local/bin/mvn
         sudo ln -s /usr/local/apache-maven-${MAVEN_VERSION}/bin/mvnDebug /usr/local/bin/mvnDebug
         sudo ln -s /usr/local/apache-maven-${MAVEN_VERSION}/bin/mvnyjp /usr/local/bin/mvnyjp
-    )
+    ) || RET=1
     rm -rf /tmp/maven
+    return ${RET:?}
 }
 
 _update_aws() {
-    echo "updating aws cli..."
     # aws --version
+    echo "updating aws cli..."
+    local RET=0
     (
         set -euo pipefail
         mkdir /tmp/aws
@@ -143,13 +151,15 @@ _update_aws() {
         sudo ./aws/install --update
         curl -s "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
         sudo dnf install -y ./session-manager-plugin.rpm
-    )
+    ) || RET=1
     rm -rf /tmp/aws
+    return ${RET:?}
 }
 
 _update_codefresh() {
-    echo "updating codefresh cli..."
     # codefresh version
+    echo "updating codefresh cli..."
+    local RET=0
     (
         set -euo pipefail
         mkdir /tmp/codefresh
@@ -159,13 +169,15 @@ _update_codefresh() {
         tar xzf codefresh.tar.gz
         sudo mv ./codefresh /usr/local/bin
         sudo chmod 755 /usr/local/bin/codefresh
-    )
+    ) || RET=1
     rm -rf /tmp/codefresh
+    return ${RET:?}
 }
 
 _update_pulumi() {
-    echo "updating pulumi cli..."
     # pulumi version
+    echo "updating pulumi cli..."
+    local RET=0
     (
         set -euo pipefail
         mkdir /tmp/pulumi/
@@ -175,13 +187,15 @@ _update_pulumi() {
         tar xzf pulumi.tar.gz
         sudo mv pulumi/pulumi* /usr/local/bin
         sudo chmod 755 /usr/local/bin/pulumi*
-    )
+    ) || RET=1
     rm -rf /tmp/pulumi
+    return ${RET:?}
 }
 
 _update_github() {
-    echo "updating github cli..."
     # gh version
+    echo "updating github cli..."
+    local RET=0
     (
         set -euo pipefail
         mkdir /tmp/github
@@ -191,13 +205,15 @@ _update_github() {
         tar xzf "github.tar.gz"
         sudo mv gh_*_linux_amd64/bin/gh /usr/local/bin/gh
         sudo chmod +x /usr/local/bin/gh
-    )
+    ) || RET=1
     rm -rf /tmp/github
+    return ${RET:?}
 }
 
 _update_ripgrep() {
-    echo "updating ripgrep..."
     # rg --version
+    echo "updating ripgrep..."
+    local RET=0
     (
         set -euo pipefail
         mkdir /tmp/ripgrep
@@ -207,13 +223,15 @@ _update_ripgrep() {
         tar xzf "ripgrep.tar.gz"
         sudo mv ripgrep-*/rg /usr/local/bin/rg
         sudo chmod +x /usr/local/bin/rg
-    )
+    ) || RET=1
     rm -rf /tmp/ripgrep
+    return ${RET:?}
 }
 
 _update_gron() {
-    echo "updating gron..."
     # gron --version
+    echo "updating gron..."
+    local RET=0
     (
         set -euo pipefail
         mkdir /tmp/gron
@@ -223,6 +241,7 @@ _update_gron() {
         tar xzf "gron.tar.gz"
         sudo mv gron /usr/local/bin/gron
         sudo chmod +x /usr/local/bin/gron
-    )
+    ) || RET=1
     rm -rf /tmp/gron
+    return ${RET:?}
 }
