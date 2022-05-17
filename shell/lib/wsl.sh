@@ -8,9 +8,8 @@ help_wsl() {
 }
 
 wsl_patch() {
-    sudo dnf -y update
-    for tool in ${CLI_TOOLS:?CLI_TOOLS is unset - check env.sh}; do
-        if !_update_$tool; then
+    for tool in system ${CLI_TOOLS:?CLI_TOOLS is unset - check env.sh}; do
+        if ! _update_$tool; then
             echo "$tool update failed - aborting remaining updates" >&2
             return 1
         fi
@@ -49,6 +48,11 @@ wsl_configs() {
     fi
 }
 
+_update_system() {
+    echo "updating system packages..."
+    sudo dnf -y update || return 1
+}
+
 _update_python() {
     echo "updating python, pip, pipx..."
     local link
@@ -61,23 +65,31 @@ _update_python() {
     if [[ ! -f /usr/bin/pydoc ]]; then
         ln -s /usr/bin/pydoc3 /usr/bin/pydoc
     fi
-    sudo pip install --upgrade pip
+    pip install --upgrade pip
     pip install --upgrade pipx
     pipx upgrade-all
 }
 
 _update_yq() {
-    echo "updating yq..."
     # yq --version
-    sudo curl -LJs $(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4) -o /usr/local/bin/yq \
-    && sudo chmod +x /usr/local/bin/yq
+    echo "updating yq..."
+    (
+        set -euo pipefail
+        sudo curl -Ls $(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4) -o /usr/local/bin/yq.new
+        sudo chmod +x /usr/local/bin/yq.new
+        sudo mv /usr/local/bin/yq.new /usr/local/bin/yq
+    )
 }
 
 _update_kubectl() {
-    echo "updating kubectl..."
     # kubectl version
-    sudo curl -sL "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
-        && sudo chmod +x /usr/local/bin/kubectl
+    echo "updating kubectl..."
+    (
+        set -euo pipefail
+        sudo curl -Ls "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl.new
+        sudo chmod +x /usr/local/bin/kubectl.new
+        sudo mv /usr/local/bin/kubectl.new /usr/local/bin/kubectl
+    )
 }
 
 _update_helm() {
@@ -111,7 +123,12 @@ _update_node() {
         curl -Ls "https://nodejs.org/download/release/latest-v14.x/${NODEJS_FILE}" -o "nodejs.tar.xz"
         sudo tar -xJf "nodejs.tar.xz" -C /usr/local --strip-components=1 --no-same-owner
         sudo rm /usr/local/CHANGELOG.md /usr/local/LICENSE /usr/local/README.md nodejs.tar.xz
-        sudo npm install --global yarn
+        # /usr/local/bin is not in sudo path, so we workaround by adding node to /usr/bin temporarily
+        sudo ln -s /usr/local/bin/node /usr/bin/node
+        sudo ln -s /usr/local/bin/npm /usr/bin/npm
+        sudo ln -s /usr/local/bin/npx /usr/bin/npx
+        sudo npm update --global yarn
+        sudo rm /usr/bin/node /usr/bin/npm /usr/bin/npx
     ) || RET=1
     rm -rf /tmp/node
     return ${RET:?}
