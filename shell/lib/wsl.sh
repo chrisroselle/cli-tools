@@ -9,20 +9,12 @@ help_wsl() {
 
 wsl_patch() {
     sudo dnf -y update
-    sudo pip install --upgrade pip
-    pip install --upgrade pipx
-    pipx upgrade-all
-    _update_yq
-    _update_kubectl
-    _update_helm
-    _update_node
-    _update_maven
-    _update_aws
-    _update_codefresh
-    _update_pulumi
-    _update_github
-    _update_ripgrep
-    _update_gron
+    for tool in ${CLI_TOOLS:?CLI_TOOLS is unset - check env.sh}; do
+        if !_update_$tool; then
+            echo "$tool update failed - aborting remaining updates" >&2
+            return 1
+        fi
+    done
     date +%s > /tmp/last_patch.txt
 }
 
@@ -57,19 +49,39 @@ wsl_configs() {
     fi
 }
 
+_update_python() {
+    echo "updating python, pip, pipx..."
+    local link
+    if [[ ! -f /usr/bin/python ]]; then
+        sudo ln -s /usr/bin/python3 /usr/bin/python
+    fi
+    if [[ ! -f /usr/bin/pip ]]; then
+        ln -s /usr/bin/pip3 /usr/bin/pip
+    fi
+    if [[ ! -f /usr/bin/pydoc ]]; then
+        ln -s /usr/bin/pydoc3 /usr/bin/pydoc
+    fi
+    sudo pip install --upgrade pip
+    pip install --upgrade pipx
+    pipx upgrade-all
+}
+
 _update_yq() {
+    echo "updating yq..."
     # yq --version
     sudo curl -LJs $(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4) -o /usr/local/bin/yq \
     && sudo chmod +x /usr/local/bin/yq
 }
 
 _update_kubectl() {
+    echo "updating kubectl..."
     # kubectl version
     sudo curl -sL "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
         && sudo chmod +x /usr/local/bin/kubectl
 }
 
 _update_helm() {
+    echo "updating helm..."
     # helm version
     (
         set -euo pipefail
@@ -85,6 +97,7 @@ _update_helm() {
 }
 
 _update_node() {
+    echo "updating node..."
     # node --version
     # yarn --version
     (
@@ -101,6 +114,7 @@ _update_node() {
 }
 
 _update_maven() {
+    echo "updating maven..."
     # mvn --version
     local MAVEN_VERSION=$(curl -s https://apache.osuosl.org/maven/maven-3/ | grep "<img" | tail -n 1 | cut -f3 -d '>' | cut -f1 -d '/')
     [[ -d /usr/local/apache-maven-${MAVEN_VERSION} ]] && return 0
@@ -118,6 +132,7 @@ _update_maven() {
 }
 
 _update_aws() {
+    echo "updating aws cli..."
     # aws --version
     (
         set -euo pipefail
@@ -133,6 +148,7 @@ _update_aws() {
 }
 
 _update_codefresh() {
+    echo "updating codefresh cli..."
     # codefresh version
     (
         set -euo pipefail
@@ -148,6 +164,7 @@ _update_codefresh() {
 }
 
 _update_pulumi() {
+    echo "updating pulumi cli..."
     # pulumi version
     (
         set -euo pipefail
@@ -163,6 +180,7 @@ _update_pulumi() {
 }
 
 _update_github() {
+    echo "updating github cli..."
     # gh version
     (
         set -euo pipefail
@@ -178,6 +196,7 @@ _update_github() {
 }
 
 _update_ripgrep() {
+    echo "updating ripgrep..."
     # rg --version
     (
         set -euo pipefail
@@ -193,6 +212,7 @@ _update_ripgrep() {
 }
 
 _update_gron() {
+    echo "updating gron..."
     # gron --version
     (
         set -euo pipefail
