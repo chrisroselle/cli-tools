@@ -7,8 +7,12 @@ help_wsl() {
     echo "np            notepad++.exe"
 }
 
+np() {
+    "/mnt/c/Program Files (x86)/Notepad++/notepad++.exe" $@
+}
+
 wsl_patch() {
-    for tool in system ${CLI_TOOLS:?CLI_TOOLS is unset - check env.sh}; do
+    for tool in system ${CLI_TOOLS:?\$CLI_TOOLS is not set - please set in $_DIR/env.sh}; do
         if ! _update_$tool; then
             echo "$tool update failed - aborting remaining updates" >&2
             return 1
@@ -17,16 +21,8 @@ wsl_patch() {
     date +%s > /tmp/last_patch.txt
 }
 
-np() {
-    "/mnt/c/Program Files (x86)/Notepad++/notepad++.exe" $@
-}
-
 wsl_configs() {
-    if [[ -z $WIN_USERNAME ]]; then
-        echo "\$WIN_USERNAME is not set - please set in $_DIR/env.sh"
-        return 1
-    fi
-    local wdir="/mnt/c/users/$WIN_USERNAME"
+    local wdir="/mnt/c/users/${WIN_USERNAME:?\$WIN_USERNAME is not set - please set in $_DIR/env.sh}"
     if [[ -f "$wdir/.aws/config" ]]; then
         mkdir ~/.aws
         cp "$wdir/.aws/config" ~/.aws/
