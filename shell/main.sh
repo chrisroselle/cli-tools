@@ -29,5 +29,6 @@ help__() {
 }
 
 help_scripts() {
-    echo
+    echo "$_DIR/script/generate_getopt/generate_getopt.py       - generate argument parsing boilerplate for shell scripts and functions"
+    echo "$_DIR/script/dedup.py                                 - remove duplicate entries in a file"
 }
