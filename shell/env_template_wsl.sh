@@ -9,4 +9,7 @@ export HISTCONTROL="erasedups"
 
 #export BROWSER='/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 export BROWSER='/mnt/c/Program Files/Mozilla Firefox/firefox.exe'
-python $_DIR/script/dedup.py ~/.bash_history
+export CLI_TOOLS='python yq kubectl helm node maven aws codefresh pulumi github ripgrep gron'
+export WIN_USERNAME=chris
+
+python "$_DIR/script/dedup.py" ~/.bash_history
