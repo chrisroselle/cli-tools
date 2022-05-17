@@ -59,8 +59,8 @@ wsl_configs() {
 
 _update_yq() {
     # yq --version
-    sudo curl -LJs $(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4) -o /usr/local/bin/yq
-    sudo chmod +x /usr/local/bin/yq
+    sudo curl -LJs $(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4) -o /usr/local/bin/yq \
+    && sudo chmod +x /usr/local/bin/yq
 }
 
 _update_kubectl() {
