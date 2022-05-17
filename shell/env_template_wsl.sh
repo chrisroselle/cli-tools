@@ -7,8 +7,9 @@ export HISTFILESIZE=99999
 export HISTIGNORE="exit"
 export HISTCONTROL="erasedups"
 
-export WIN_USERNAME=chris
-export CLI_TOOLS='python yq kubectl helm node maven aws codefresh pulumi github ripgrep gron'
 #export BROWSER='/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 export BROWSER='/mnt/c/Program Files/Mozilla Firefox/firefox.exe'
+export CLI_TOOLS='python yq kubectl helm node maven aws codefresh pulumi github ripgrep gron'
+export WIN_USERNAME=chris
+
 python "$_DIR/script/dedup.py" ~/.bash_history
