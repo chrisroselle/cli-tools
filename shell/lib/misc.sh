@@ -2,15 +2,28 @@ help_misc() {
     echo "misc.sh:"
     echo "---------"
     echo "hist                                      - search command history"
+    echo "check_route                               - check network route using telnet"
     echo "--shorthand:"
     echo "mgrep         grep -i '\$1' | grep -i '\$2' | ..."
+    echo "cgrep         grep -iR '\$1' $git | grep -i '\$2' | ..."
 }
 
 mgrep() {
-    [[ -z $1 ]] && { echo "usage: $FUNCNAME <pattern> ..." >&2; return 1; }
-    local command="grep -i '$1'"
+    [[ -z $1 || $1 == "--help" ]] && { echo "usage: $FUNCNAME <pattern> ..." >&2; return 1; }
+    local command="rg -i '$1'"
+    shift
     for pattern in "$@"; do
-        command+=" | grep -i '$pattern'"
+        command+=" | rg -i '$pattern'"
+    done
+    eval $command
+}
+
+cgrep() {
+    [[ -z $1 || $1 == "--help" ]] && { echo "usage: $FUNCNAME <pattern> ..." >&2; return 1; }
+    local command="rg -i -g '!notes/' '$1' $git"
+    shift
+    for pattern in "$@"; do
+        command+=" | rg -i '$pattern'"
     done
     eval $command
 }

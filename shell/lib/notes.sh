@@ -26,7 +26,7 @@ note() {
 
 notes() {
     [[ -z $1 || $1 == "--help" ]] && { echo "usage: $FUNCNAME <content_search> ..." >&2; return 1; }
-    local command="rg -i '$1' $notes"
+    local command="rg -iu '$1' $notes"
     shift
     for search in "$@"; do
         command+=" | rg -i '$search'"
@@ -40,7 +40,7 @@ notes_or() {
     for search_term in "$@"; do
         params+=" -e '$search_term'"
     done
-    rg -i $params $notes
+    rg -iu $params $notes
 }
 
 new_note() {
