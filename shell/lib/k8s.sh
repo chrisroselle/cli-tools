@@ -20,7 +20,7 @@ kcc() {
 
 kuc() {
     local context=$1
-    [[ -z $context ]] && context="ip-app-dev"
+    [[ -z $context ]] && context="my-default-context"
     kubectl config use-context $context
 }
 
