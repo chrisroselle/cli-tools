@@ -26,9 +26,9 @@ note() {
 
 notes() {
     [[ -z $1 ]] && { echo "usage: $FUNCNAME <content_search> ..." >&2; return 1; }
-    local command="grep -iR '$1' $notes"
+    local command="rg -iR '$1' $notes"
     for search in "$@"; do
-        command+=" | grep -i '$search'"
+        command+=" | rg -i '$search'"
     done
     eval $command
 }
@@ -39,7 +39,7 @@ notes_or() {
     for search_term in "$@"; do
         params+=" -e '$search_term'"
     done
-    grep -iR $params $notes
+    rg -iR $params $notes
 }
 
 new_note() {
