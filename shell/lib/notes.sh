@@ -10,7 +10,7 @@ help_notes() {
 }
 
 note() {
-    [[ -z $1 ]] && { echo "usage: $FUNCNAME <filename_search>" >&2; return 1; }
+    [[ -z $1 || $1 == "--help" ]] && { echo "usage: $FUNCNAME <filename_search>" >&2; return 1; }
     local search=$1
     local count=$(find $notes -type f -name "*$search*" | wc -l)
     if ((count > 1)); then
@@ -20,13 +20,14 @@ note() {
         return 1
     else
         local match=$(find $notes -type f -name "*$search*")
-        vi $match
+        ${CLI_EDITOR:?} $match
     fi
 }
 
 notes() {
-    [[ -z $1 ]] && { echo "usage: $FUNCNAME <content_search> ..." >&2; return 1; }
-    local command="rg -iR '$1' $notes"
+    [[ -z $1 || $1 == "--help" ]] && { echo "usage: $FUNCNAME <content_search> ..." >&2; return 1; }
+    local command="rg -i '$1' $notes"
+    shift
     for search in "$@"; do
         command+=" | rg -i '$search'"
     done
@@ -34,27 +35,27 @@ notes() {
 }
 
 notes_or() {
-    [[ -z $1 ]] && { echo "usage: $FUNCNAME <content_search> ..." >&2; return 1; }
+    [[ -z $1 || $1 == "--help" ]] && { echo "usage: $FUNCNAME <content_search> ..." >&2; return 1; }
     local params=""
     for search_term in "$@"; do
         params+=" -e '$search_term'"
     done
-    rg -iR $params $notes
+    rg -i $params $notes
 }
 
 new_note() {
-    [[ -z $1 ]] && { echo "usage: $FUNCNAME <name>" >&2; return 1; }
+    [[ -z $1 || $1 == "--help" ]] && { echo "usage: $FUNCNAME <name>" >&2; return 1; }
     local name=$1
-    vi "${notes}/$name.txt"
+    ${CLI_EDITOR:?} "${notes}/$name.txt"
 }
 
 new_meeting_note() {
-    [[ -z $1 ]] && { echo "usage: $FUNCNAME <name>" >&2; return 1; }
+    [[ -z $1 || $1 == "--help" ]] && { echo "usage: $FUNCNAME <name>" >&2; return 1; }
     local name=$1
     local datestring=$(date "+%Y-%m-%d")
-    vi "${notes}/meeting-notes/${datestring}-${name}.txt"
+    ${CLI_EDITOR:?} "${notes}/meeting-notes/${datestring}-${name}.txt"
 }
 
 todo() {
-    vi "${notes}/TODO"
+    ${CLI_EDITOR:?} "${notes}/TODO"
 }

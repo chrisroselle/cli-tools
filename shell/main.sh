@@ -8,6 +8,10 @@ for f in $_DIR/lib/*.sh; do
   source $f
 done
 
+if [[ -z $CLI_EDITOR ]]; then
+    export CLI_EDITOR='vi'
+fi
+
 help__() {
     help_aws
     echo
