@@ -25,6 +25,14 @@ alp() {
     aws configure list-profiles
 }
 
+ec2() {
+    if [[ -z "$1" ]]; then
+        aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | .InstanceId + " " + (.Tags[] | select(.Key == "Name")).Value + " " + .State.Name + " " + .NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress'
+    else
+        aws ec2 describe-instances | jq -r '.Reservations[].Instances[] | .InstanceId + " " + (.Tags[] | select(.Key == "Name")).Value + " " + .State.Name + " " + .NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress' | grep -i "$1"
+    fi
+}
+
 elb() {
     (
         set +m
