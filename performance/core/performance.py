@@ -48,7 +48,27 @@ class Request():
 _HTTP_RESPONSE_FIELDS = ['2XX', '4XX', '5XX', 'No Response', 'Other']
 _PERCENTILE_FIELDS = ['50p', '75p', '90p', '99p']
 
-def performance_report(logs, request_parser, component_parser, time_bucket: TimeBucket = TimeBucket.NONE, include_query=False):
+def date_filter(request, start_date=None, end_date=None):
+    d = request.request_time.date()
+    if start_date is not None and d < start_date:
+        return False
+    if end_date is not None and d > end_date:
+        return False
+    return True
+
+def url_filter(request, pattern, reverse_match=False):
+    if request.path.contains(pattern):
+        if reverse_match:
+            return False
+        else:
+            return True
+    else:
+        if reverse_match:
+            return True
+        else:
+            return False
+
+def performance_report(logs, request_parser, component_parser, request_filter, time_bucket: TimeBucket = TimeBucket.NONE, include_query=False):
     no_bucket, by_day, by_hour, by_minute = _time_bucket_bools(time_bucket)
 
     skipped = []
@@ -72,6 +92,8 @@ def performance_report(logs, request_parser, component_parser, time_bucket: Time
                     d[component] = {}
             for line in file.readlines():
                 req = request_parser(line)
+                if not request_filter(req):
+                    continue
                 _process_times(req, component, times)
                 if req.duration is None or req.duration == 0:
                     _process_performance(req, component, inbound_http, time_bucket, include_query, omit_duration=True)
