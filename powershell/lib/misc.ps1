@@ -19,3 +19,7 @@ function lsf($search) {
 function utc() {
     [datetime]::Now.ToUniversalTime()
 }
+
+function Which($command) {
+    where.exe $command
+}
