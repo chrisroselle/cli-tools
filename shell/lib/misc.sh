@@ -111,3 +111,13 @@ check_route()  {
     done
     return $returncode
 }
+
+continue_prompt() {
+    local cont
+    while [[ $cont != "y" && $cont != "n" ]]; do
+        read -p "$@ - continue? (y/n): " cont
+    done
+    if [[ $cont != "y" ]]; then
+        return 1
+    fi
+}
