@@ -3,6 +3,7 @@ help_misc() {
     echo "---------"
     echo "hist                                      - search command history"
     echo "check_route                               - check network route using telnet"
+    echo "continue_prompt                           - prompt before continuing"
     echo "--shorthand:"
     echo "mgrep         grep -i '\$1' | grep -i '\$2' | ..."
     echo "cgrep         grep -iR '\$1' $git | grep -i '\$2' | ..."
@@ -110,4 +111,15 @@ check_route()  {
         echo -e '\x1dclose' | telnet "$host" "$port" || returncode=$((returncode + 1))
     done
     return $returncode
+}
+
+continue_prompt() {
+    [[ -z $1 || $! == "--help" ]] && { echo "usage: $FUNCNAME <message>" >&2; return 1; }
+    local cont
+    while [[ $cont != "y" && $cont != "n" ]]; do
+        read -p "$@ - continue? (y/n): " cont
+    done
+    if [[ $cont != "y" ]]; then
+        return 1
+    fi
 }
